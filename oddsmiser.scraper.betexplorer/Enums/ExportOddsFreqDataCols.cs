@@ -1,0 +1,63 @@
+﻿
+namespace oddsmiser.scraper.betexplorer.Enums
+{
+    public enum ExportOddsFreqDataCols
+    {
+        ID = 0,
+        Country,
+        Division,
+        Seazon,
+        MatchDate,
+        HomeTeam,
+        AwayTeam,
+        HomeScore,
+        AwayScore,
+        HalfTimeHomeScore,
+        HalfTimeAwayScore,
+        AvgHomeOdds,
+        AvgDrawOdds,
+        AvgAwayOdds,
+        Home_Team_Total_Matches_Played,
+        Home_Team_Ranking,
+        Home_Team_Points,
+        Home_Team_Matches_Played_At_Home_SoFar,
+        Home_Team_Matches_Played_At_Home_SoFar_Goals_For,
+        Home_Team_Matches_Played_At_Home_SoFar_Goals_Against,
+        Home_Team_Matches_Played_Away_SoFar,
+        Home_Team_Matches_Played_Away_SoFar_Goals_For,
+        Home_Team_Matches_Played_Away_SoFar_Goals_Against,
+        Away_Team_Total_Matches_Played,
+        Away_Team_Ranking,
+        Away_Team_points,
+        Away_Team_Matches_Played_At_Home_SoFar,
+        Away_Team_Matches_Played_At_Home_SoFar_Goals_For,
+        Away_Team_Matches_Played_At_Home_SoFar_Goals_Against,
+        Away_Team_Matches_Played_Away_SoFar,
+        Away_Team_Matches_Played_Away_SoFar_Goals_For,
+        Away_Team_Matches_Played_Away_SoFar_Goals_Against,
+        HIST_TOTAL_GAMES_BTW,
+        HIST_TOTAL_GAMES_BTW_HOME_WINS,
+        HIST_TOTAL_GAMES_BTW_HOME_WINS_PERC,
+        HIST_TOTAL_GAMES_BTW_DRAWS,
+        HIST_TOTAL_GAMES_BTW_DRAWS_PERC,
+        HIST_TOTAL_GAMES_BTW_AWAY_TEAM_WINS,
+        HIST_TOTAL_GAMES_BTW_AWAY_TEAM_WINS_PERC,
+        HIST_TOTAL_GAMES_BTW_HOME_SCORE,
+        HIST_TOTAL_GAMES_BTW_AWAY_SCORE,
+        HOME_TEAM_LAST_5_GAMES_WINS,
+        HOME_TEAM_LAST_5_GAMES_WINS_PERC,
+        HOME_TEAM_LAST_5_GAMES_DRAWS,
+        HOME_TEAM_LAST_5_GAMES_DRAWS_PERC,
+        HOME_TEAM_LAST_5_GAMES_LOSSES,
+        HOME_TEAM_LAST_5_GAMES_LOSSES_PERC,
+        AWAY_TEAM_LAST_5_GAMES_WINS,
+        AWAY_TEAM_LAST_5_GAMES_WINS_PERC,
+        AWAY_TEAM_LAST_5_GAMES_WINS_DRAWS,
+        AWAY_TEAM_LAST_5_GAMES_DRAWS_PERC,
+        AWAY_TEAM_LAST_5_GAMES_LOSSES,
+        AWAY_TEAM_LAST_5_GAMES_LOSSES_PERC
+
+    }
+
+}
+

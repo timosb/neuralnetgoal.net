@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "oddsmiser.scraper.betexplorer": {
+      "commandName": "Project",
+      "commandLineArgs": "-H -Soccer"
+    }
+  }
+}
