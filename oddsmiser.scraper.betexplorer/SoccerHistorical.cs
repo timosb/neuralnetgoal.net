@@ -417,7 +417,7 @@ namespace oddsmiser.scraper.betexplorer
             {
                 var vector = await connection.QueryAsync<SoccerDataVector>("select * from dbo.fn_Soccer_fixtures()", commandTimeout: 200);
                 var path = ExportFixtures(vector.ToList());
-                Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+                OpenFile(path);
             }
             
             _loger.LogInformation($"Import fixtures process finished.");
@@ -610,9 +610,9 @@ namespace oddsmiser.scraper.betexplorer
                 {
 
                     var currDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-                    var templFile = currDir + "\\templates\\Training_data.xlsx";
+                    var templFile = Path.Combine(currDir, "templates", "Training_data.xlsx");
                     SpreadsheetInfo.SetLicense("SN-2020Nov05-kLAsb7p1RhzuOPcbbrldwaJd9G5LLgmzIVrtz3GBFIHki2HUw9NYiXGl1LAjxGxXBtms1K4YbATi8Ik0PYPi/Cl6PRw==A");
-                    var expFileFullName = currDir + "\\OddsFreqProbTrainingData" + DateTime.Now.ToString("dd-MM-yyHHmmss") + ".xlsx";
+                    var expFileFullName = Path.Combine(currDir, "OddsFreqProbTrainingData" + DateTime.Now.ToString("dd-MM-yyHHmmss") + ".xlsx");
                     var oBook = new ExcelFile();
                     oBook = ExcelFile.Load(templFile);
                     var templateWS = oBook.Worksheets["template"];
@@ -646,9 +646,28 @@ namespace oddsmiser.scraper.betexplorer
             }
             catch (Exception ex)
             {
+                _loger.LogError(ex, "Export of training data failed");
                 return false;
             }
                        
+        }
+
+        private void OpenFile(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return;
+            try
+            {
+                if (OperatingSystem.IsWindows())
+                    Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
+                else if (OperatingSystem.IsMacOS())
+                    Process.Start("open", new[] { path });
+                else
+                    Process.Start("xdg-open", new[] { path });
+            }
+            catch (Exception ex)
+            {
+                _loger.LogWarning(ex, $"Could not open {path}");
+            }
         }
 
         public string ExportFixtures(List<SoccerDataVector> fixtures)
@@ -657,10 +676,11 @@ namespace oddsmiser.scraper.betexplorer
             {
                 SpreadsheetInfo.SetLicense("SN-2020Nov05-kLAsb7p1RhzuOPcbbrldwaJd9G5LLgmzIVrtz3GBFIHki2HUw9NYiXGl1LAjxGxXBtms1K4YbATi8Ik0PYPi/Cl6PRw==A");
                 var currDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-                var templFile = currDir + @"\templates\Training_data.xlsx";
+                var templFile = Path.Combine(currDir, "templates", "Training_data.xlsx");
                 
-                var tempDir = Path.GetTempPath();
-                var expFileFullName = tempDir + @"Fixtures" + DateTime.Now.ToString("ddMMyy") + ".xlsx";
+                var downloadsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+                Directory.CreateDirectory(downloadsDir);
+                var expFileFullName = Path.Combine(downloadsDir, "Fixtures" + DateTime.Now.ToString("ddMMyy") + ".xlsx");
                 if(File.Exists(expFileFullName))
                     File.Delete(expFileFullName);
 
@@ -680,7 +700,7 @@ namespace oddsmiser.scraper.betexplorer
             }
             catch (Exception ex)
             {
-
+                _loger.LogError(ex, "Export of fixtures failed");
                 return String.Empty;
             }
         }

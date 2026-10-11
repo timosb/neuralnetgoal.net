@@ -48,7 +48,7 @@ namespace oddsmiser.scraper.betexplorer
             services.AddSingleton<IConfiguration>(configuration);
 
             Log.Logger = new LoggerConfiguration().MinimumLevel.Error()
-                       .WriteTo.File("logs\\oddsmiser.scrapper.betexplorer.log", rollingInterval: RollingInterval.Day)
+                       .WriteTo.File(Path.Combine("logs", "oddsmiser.scrapper.betexplorer.log"), rollingInterval: RollingInterval.Day)
                        .WriteTo.Console()
                        .CreateLogger();
 
@@ -87,7 +87,7 @@ namespace oddsmiser.scraper.betexplorer
 
 
                        Log.Logger = new LoggerConfiguration().MinimumLevel.Error()
-                       .WriteTo.File("logs\\oddsmiser.scrapper.betexplorer.log", rollingInterval: RollingInterval.Day)
+                       .WriteTo.File(Path.Combine("logs", "oddsmiser.scrapper.betexplorer.log"), rollingInterval: RollingInterval.Day)
                        .WriteTo.Console()
                        .CreateLogger();
 
