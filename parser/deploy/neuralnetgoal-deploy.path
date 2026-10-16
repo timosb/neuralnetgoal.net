@@ -1,0 +1,11 @@
+# /etc/systemd/system/neuralnetgoal-deploy.path
+# Watches the marker file you upload LAST over SFTP and starts neuralnetgoal-deploy.service when it changes.
+[Unit]
+Description=Apply a parser deployment when the DEPLOY marker is uploaded
+
+[Path]
+PathChanged=/opt/neuralnetgoal-incoming/DEPLOY
+Unit=neuralnetgoal-deploy.service
+
+[Install]
+WantedBy=multi-user.target

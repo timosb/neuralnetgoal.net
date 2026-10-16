@@ -1,0 +1,8 @@
+# /etc/systemd/system/neuralnetgoal-deploy.service
+# Started by neuralnetgoal-deploy.path (never enable it directly). Runs as root, once per upload.
+[Unit]
+Description=Apply a neuralnetgoal parser deployment
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/neuralnetgoal-apply-deploy

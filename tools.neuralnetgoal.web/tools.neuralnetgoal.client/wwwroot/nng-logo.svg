@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1024 1024"
+   version="1.1"
+   id="svg20"
+   sodipodi:docname="new 5.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview20"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.80175781"
+     inkscape:cx="511.37637"
+     inkscape:cy="611.78076"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg20" />
+  <defs
+     id="defs2">
+    <filter
+       id="glow"
+       x="-0.72"
+       y="-0.72"
+       width="2.44"
+       height="2.44">
+      <feGaussianBlur
+         stdDeviation="15"
+         result="coloredBlur"
+         id="feGaussianBlur1" />
+      <feMerge
+         id="feMerge2">
+        <feMergeNode
+           in="coloredBlur"
+           id="feMergeNode1" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode2" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect
+     width="1024"
+     height="1024"
+     fill="#3a3a3a"
+     id="rect2"
+     x="1.1586963e-07"
+     y="5.4734633e-06"
+     sodipodi:insensitive="true" />
+  <g
+     id="g21"
+     transform="translate(2.4945189,-109.75883)">
+    <line
+       x1="390"
+       y1="500"
+       x2="550"
+       y2="360"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line2" />
+    <line
+       x1="390"
+       y1="500"
+       x2="500"
+       y2="480"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line3" />
+    <line
+       x1="390"
+       y1="500"
+       x2="550"
+       y2="540"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line4" />
+    <line
+       x1="390"
+       y1="500"
+       x2="550"
+       y2="640"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line5" />
+    <line
+       x1="550"
+       y1="360"
+       x2="500"
+       y2="480"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line6" />
+    <line
+       x1="550"
+       y1="360"
+       x2="600"
+       y2="470"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line7" />
+    <line
+       x1="500"
+       y1="480"
+       x2="550"
+       y2="540"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line8" />
+    <line
+       x1="500"
+       y1="480"
+       x2="600"
+       y2="470"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line9" />
+    <line
+       x1="550"
+       y1="540"
+       x2="600"
+       y2="470"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line10" />
+    <line
+       x1="550"
+       y1="540"
+       x2="650"
+       y2="580"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line11" />
+    <line
+       x1="550"
+       y1="640"
+       x2="550"
+       y2="540"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line12" />
+    <line
+       x1="600"
+       y1="470"
+       x2="650"
+       y2="580"
+       stroke="#ffffff"
+       stroke-width="3"
+       id="line13" />
+    <circle
+       cx="550"
+       cy="360"
+       r="20"
+       fill="#ffffff"
+       id="circle13" />
+    <circle
+       cx="500"
+       cy="480"
+       r="20"
+       fill="#ffffff"
+       id="circle14" />
+    <circle
+       cx="550"
+       cy="540"
+       r="20"
+       fill="#ffffff"
+       id="circle15" />
+    <circle
+       cx="600"
+       cy="470"
+       r="20"
+       fill="#ffffff"
+       id="circle16" />
+    <circle
+       cx="550"
+       cy="640"
+       r="20"
+       fill="#ffffff"
+       id="circle17" />
+    <circle
+       cx="650"
+       cy="580"
+       r="20"
+       fill="#ffffff"
+       id="circle18" />
+    <circle
+       cx="390"
+       cy="500"
+       r="25"
+       fill="#00bfff"
+       filter="url(#glow)"
+       id="circle19" />
+  </g>
+  <text
+     x="220"
+     y="690"
+     font-family="Arial, sans-serif"
+     font-size="60"
+     font-weight="300"
+     fill="#c0c0c0"
+     id="text19">NEURAL NET</text>
+  <g
+     id="g22"
+     transform="translate(-16.214373,-1.2472594)">
+    <text
+       x="635"
+       y="690"
+       font-family="Arial, sans-serif"
+       font-size="60px"
+       font-weight="300"
+       fill="#00bfff"
+       id="text20">GOAL</text>
+  </g>
+  <line
+     x1="620.0329"
+     y1="698.75275"
+     x2="793.0329"
+     y2="698.75275"
+     stroke="#00bfff"
+     stroke-width="3"
+     id="line20" />
+</svg>

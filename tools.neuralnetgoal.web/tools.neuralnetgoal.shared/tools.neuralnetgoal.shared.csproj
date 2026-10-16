@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Request/response classes shared by the service and the Blazor client. No logic, no secrets. -->
+  <PropertyGroup>
+    <RootNamespace>Tools.NeuralNetGoal.Shared</RootNamespace>
+  </PropertyGroup>
+</Project>

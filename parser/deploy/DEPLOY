@@ -1,0 +1,1 @@
+Upload this file LAST. Uploading it tells the server to apply the files you uploaded to /opt/neuralnetgoal-incoming (or, if there are none, to just restart the API).

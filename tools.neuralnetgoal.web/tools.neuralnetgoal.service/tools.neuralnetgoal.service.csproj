@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Minimal API: all server-side work (database, parser calls, Excel, authentication) and it also serves the Blazor client. -->
+  <PropertyGroup>
+    <RootNamespace>Tools.NeuralNetGoal.Service</RootNamespace>
+    <UserSecretsId>tools-neuralnetgoal-service-3c9d2f71-8a4e-4b1a-9f55-0d6e7a2b4c18</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\tools.neuralnetgoal.shared\tools.neuralnetgoal.shared.csproj" />
+    <ProjectReference Include="..\tools.neuralnetgoal.client\tools.neuralnetgoal.client.csproj" />
+    <ProjectReference Include="..\..\parser\neuralnetgoal.parser\neuralnetgoal.parser.csproj" />
+    <ProjectReference Include="..\..\parser\neuralnetgoal.parser.client\neuralnetgoal.parser.client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="templates\Training_data.xlsx" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="GemBox.Spreadsheet" Version="47.0.1044" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
+  </ItemGroup>
+</Project>

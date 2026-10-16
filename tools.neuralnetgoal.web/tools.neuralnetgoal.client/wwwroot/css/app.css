@@ -1,0 +1,45 @@
+/* Palette taken from the logo: background #3a3a3a, accent #00bfff, text #c0c0c0 */
+:root {
+    --nng-bg: #3a3a3a;
+    --nng-bg-dark: #2e2e2e;
+    --nng-panel: #444444;
+    --nng-accent: #00bfff;
+    --nng-text: #c0c0c0;
+    --bs-body-bg: var(--nng-bg);
+    --bs-body-color: var(--nng-text);
+    --bs-primary: var(--nng-accent);
+    --bs-primary-rgb: 0, 191, 255;
+    --bs-link-color: var(--nng-accent);
+    --bs-link-hover-color: #5fd7ff;
+}
+
+html, body { background: var(--nng-bg); color: var(--nng-text); font-family: "Segoe UI", system-ui, Arial, sans-serif; }
+
+.nng-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 1rem; }
+.nng-loading img { width: 160px; }
+
+.nng-navbar { background: var(--nng-bg-dark); border-bottom: 2px solid var(--nng-accent); }
+.nng-navbar .navbar-brand img { height: 44px; }
+.nng-navbar .nav-link { color: var(--nng-text); }
+.nng-navbar .nav-link:hover, .nng-navbar .nav-link.active { color: var(--nng-accent); }
+
+.nng-card { background: var(--nng-panel); border: 1px solid #555; border-radius: .5rem; padding: 1.25rem; }
+.nng-accent { color: var(--nng-accent); }
+
+.nng-login { max-width: 420px; margin: 8vh auto; }
+.nng-login img { width: 220px; display: block; margin: 0 auto 1.5rem; }
+
+/* live job log */
+.nng-log { background: #1f1f1f; border: 1px solid #555; border-radius: .4rem; height: 420px; overflow-y: auto; padding: .6rem;
+           font-family: Consolas, "Cascadia Mono", monospace; font-size: .85rem; white-space: pre-wrap; }
+.nng-log .Info { color: #c0c0c0; }
+.nng-log .Ok { color: #4cd964; }
+.nng-log .Warn { color: #ffcc00; }
+.nng-log .Error { color: #ff5c5c; }
+.nng-log .Header { color: var(--nng-accent); font-weight: 600; margin-top: .5rem; }
+.nng-log .time { color: #777; margin-right: .5rem; }
+
+.k-grid { --kendo-color-surface: #444; }
+
+#blazor-error-ui { background: #5a1a1a; bottom: 0; box-shadow: 0 -1px 2px rgba(0,0,0,.4); color: #fff; display: none; left: 0; padding: .6rem 1.25rem; position: fixed; width: 100%; z-index: 1000; }
+#blazor-error-ui .reload { color: var(--nng-accent); margin-left: .5rem; }

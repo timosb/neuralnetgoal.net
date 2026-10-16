@@ -1,0 +1,29 @@
+@page "/leagues"
+@attribute [Authorize]
+@inject ApiClient Api
+
+<PageTitle>Leagues - NeuralNetGoal</PageTitle>
+
+<h3 class="nng-accent mb-3">Running leagues <small class="text-secondary">(dbo.SoccerRunningLeagues)</small></h3>
+
+@if (_error is not null) { <div class="alert alert-danger">@_error</div> }
+
+<TelerikGrid Data="_leagues" Pageable="true" PageSize="25" Sortable="true" FilterMode="@GridFilterMode.FilterRow" Height="calc(100vh - 220px)">
+    <GridColumns>
+        <GridColumn Field="@nameof(LeagueDto.Country)" Title="Country" />
+        <GridColumn Field="@nameof(LeagueDto.Division)" Title="Division" />
+        <GridColumn Field="@nameof(LeagueDto.Season)" Title="Season" Width="140px" />
+        <GridColumn Field="@nameof(LeagueDto.Url)" Title="Betexplorer path" />
+    </GridColumns>
+</TelerikGrid>
+
+@code {
+    private List<LeagueDto> _leagues = [];
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var r = await Api.LeaguesAsync();
+        if (r.Ok) _leagues = r.Value!; else _error = r.Error;
+    }
+}

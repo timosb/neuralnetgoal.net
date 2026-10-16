@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+  <!-- Blazor WebAssembly UI: Bootstrap 5 + Telerik UI for Blazor. Runs in the browser, so it must never contain secrets. -->
+  <PropertyGroup>
+    <RootNamespace>Tools.NeuralNetGoal.Client</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\tools.neuralnetgoal.shared\tools.neuralnetgoal.shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.12" />
+    <PackageReference Include="Telerik.UI.for.Blazor" Version="15.0.1" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,64 @@
+@page "/"
+@attribute [Authorize]
+@inject ApiClient Api
+
+<PageTitle>Dashboard - NeuralNetGoal</PageTitle>
+
+<h3 class="nng-accent mb-4">Dashboard</h3>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="nng-card h-100">
+            <h5>System</h5>
+            @if (_health is null)
+            {
+                <p class="text-secondary">Checking the database and the parser...</p>
+            }
+            else if (_healthError is not null)
+            {
+                <div class="alert alert-danger py-2">@_healthError</div>
+            }
+            else
+            {
+                <ul class="list-unstyled mb-0">
+                    <li>Database: @Badge(_health.DatabaseOk) @_health.DatabaseError</li>
+                    <li>Parser: @Badge(_health.ParserOk) <span class="text-secondary">@_health.Parser</span></li>
+                    <li class="text-secondary small">@_health.ParserMessage</li>
+                </ul>
+            }
+            <TelerikButton OnClick="LoadAsync" Class="mt-3" FillMode="@ThemeConstants.Button.FillMode.Outline">Check again</TelerikButton>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="nng-card h-100">
+            <h5>Recent jobs <small class="text-secondary">(kept until the site restarts)</small></h5>
+            <TelerikGrid Data="_jobs" Pageable="false" Height="280px">
+                <GridColumns>
+                    <GridColumn Field="@nameof(JobSummaryDto.Description)" Title="Job" />
+                    <GridColumn Field="@nameof(JobSummaryDto.State)" Title="State" Width="120px" />
+                    <GridColumn Field="@nameof(JobSummaryDto.StartedUtc)" Title="Started" DisplayFormat="{0:dd/MM HH:mm}" Width="130px" />
+                </GridColumns>
+            </TelerikGrid>
+        </div>
+    </div>
+</div>
+
+@code {
+    private HealthDto? _health;
+    private string? _healthError;
+    private List<JobSummaryDto> _jobs = [];
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _health = null; _healthError = null;
+        var jobs = await Api.JobsAsync();
+        if (jobs.Ok) _jobs = jobs.Value!;
+        var h = await Api.HealthAsync();
+        if (h.Ok) _health = h.Value; else _healthError = h.Error;
+    }
+
+    private static RenderFragment Badge(bool ok) => b =>
+        b.AddMarkupContent(0, ok ? "<span class=\"badge bg-success\">OK</span>" : "<span class=\"badge bg-danger\">PROBLEM</span>");
+}

@@ -1,0 +1,86 @@
+@page "/login"
+@layout EmptyLayout
+@attribute [AllowAnonymous]
+@inject ApiClient Api
+@inject ApiAuthStateProvider Auth
+@inject NavigationManager Nav
+
+<PageTitle>Sign in - NeuralNetGoal</PageTitle>
+
+<div class="nng-login nng-card">
+    <img src="nng-logo.svg" alt="NeuralNetGoal" />
+    @if (_needsSetup)
+    {
+        <h5 class="nng-accent">First start: create the Admin password</h5>
+        <p class="text-secondary small">User name: <strong>Admin</strong>. At least 10 characters, letters and digits. You set it once, here.</p>
+        <form @onsubmit="SetupAsync" @onsubmit:preventDefault>
+            <div class="mb-3"><label class="form-label">Password</label><TelerikTextBox @bind-Value="_password" Password="true" AutoComplete="new-password" Width="100%" /></div>
+            <div class="mb-3"><label class="form-label">Repeat the password</label><TelerikTextBox @bind-Value="_repeat" Password="true" AutoComplete="new-password" Width="100%" /></div>
+            @if (_error is not null) { <div class="alert alert-danger py-2">@_error</div> }
+            <TelerikButton ButtonType="@ButtonType.Submit" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary" Enabled="@(!_busy)" Class="w-100">Create password and sign in</TelerikButton>
+        </form>
+    }
+    else
+    {
+    <form @onsubmit="SignInAsync" @onsubmit:preventDefault>
+        <div class="mb-3">
+            <label class="form-label" for="user">User name</label>
+            <TelerikTextBox Id="user" @bind-Value="_user" AutoComplete="username" Width="100%" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="pwd">Password</label>
+            <TelerikTextBox Id="pwd" @bind-Value="_password" Password="true" AutoComplete="current-password" Width="100%" />
+        </div>
+        @if (_error is not null)
+        {
+            <div class="alert alert-danger py-2">@_error</div>
+        }
+        <TelerikButton ButtonType="@ButtonType.Submit" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary" Enabled="@(!_busy)" Class="w-100">
+            @(_busy ? "Signing in..." : "Sign in")
+        </TelerikButton>
+    </form>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
+    private string _user = "";
+    private string _password = "";
+    private string? _error;
+    private bool _busy;
+    private bool _needsSetup;
+    private string _repeat = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var s = await Api.SetupStatusAsync();
+        _needsSetup = s.Ok && s.Value!.NeedsSetup;
+    }
+
+    private async Task SetupAsync()
+    {
+        _error = null;
+        if (_password != _repeat) { _error = "The two passwords are not the same."; return; }
+        _busy = true;
+        var r = await Api.SetupAsync(_password);
+        _busy = false;
+        if (!r.Ok) { _error = r.Error; return; }
+        Auth.SetUser(r.Value);
+        Nav.NavigateTo("", replace: true);
+    }
+
+    private async Task SignInAsync()
+    {
+        _busy = true; _error = null;
+        var r = await Api.LoginAsync(_user, _password);
+        _busy = false;
+        if (!r.Ok) { _error = r.Error; _password = ""; return; }
+
+        Auth.SetUser(r.Value);
+        if (r.Value!.MustChangePassword) { Nav.NavigateTo("change-password", replace: true); return; }
+        // only follow a relative return address (never an address on another site)
+        var target = !string.IsNullOrEmpty(ReturnUrl) && !ReturnUrl.Contains("://") && !ReturnUrl.StartsWith("//") ? ReturnUrl : "";
+        Nav.NavigateTo(target, replace: true);
+    }
+}

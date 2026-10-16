@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Typed .NET client for the parser Web API. Also implements the library interfaces over HTTP,
+       so a caller can swap "in-process parser" for "parser on the VPS" without changing its code. -->
+  <PropertyGroup>
+    <AssemblyName>neuralnetgoal.parser.client</AssemblyName>
+    <RootNamespace>NeuralNetGoal.Parser.Client</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\neuralnetgoal.parser\neuralnetgoal.parser.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,58 @@
+@inherits LayoutComponentBase
+@inject ApiAuthStateProvider Auth
+@inject ApiClient Api
+@inject NavigationManager Nav
+
+<TelerikRootComponent>
+    <nav class="navbar navbar-expand-lg nng-navbar">
+        <div class="container-fluid">
+            <NavLink class="navbar-brand" href="" Match="NavLinkMatch.All">
+                <img src="nng-logo.svg" alt="NeuralNetGoal" />
+            </NavLink>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nngNav" aria-controls="nngNav" aria-expanded="false" aria-label="Menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="nngNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><NavLink class="nav-link" href="" Match="NavLinkMatch.All">Dashboard</NavLink></li>
+                    <li class="nav-item"><NavLink class="nav-link" href="leagues">Leagues</NavLink></li>
+                    <AuthorizeView Roles="Admin,Operator">
+                        <li class="nav-item"><NavLink class="nav-link" href="run">Run</NavLink></li>
+                        <li class="nav-item"><a class="nav-link" href="run?cmd=fixtures">Fixtures &amp; Excel</a></li>
+                    </AuthorizeView>
+                    <li class="nav-item"><NavLink class="nav-link" href="errors">Errors</NavLink></li>
+                    <AuthorizeView Roles="Admin">
+                        <li class="nav-item"><NavLink class="nav-link" href="users">Users</NavLink></li>
+                    </AuthorizeView>
+                </ul>
+                <AuthorizeView>
+                    <Authorized>
+                        <span class="navbar-text me-3">@context.User.Identity?.Name</span>
+                        <TelerikButton OnClick="SignOut" ThemeColor="@ThemeConstants.Button.ThemeColor.Secondary" FillMode="@ThemeConstants.Button.FillMode.Outline">Sign out</TelerikButton>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-fluid py-4 px-4">
+        @Body
+    </main>
+</TelerikRootComponent>
+
+@code {
+    // A user who has to choose a new password cannot use any other page until they did.
+    protected override async Task OnParametersSetAsync()
+    {
+        await Auth.GetAuthenticationStateAsync();
+        if (Auth.Current is { MustChangePassword: true } && !Nav.Uri.Contains("change-password", StringComparison.OrdinalIgnoreCase))
+            Nav.NavigateTo("change-password", replace: true);
+    }
+
+    private async Task SignOut()
+    {
+        await Api.LogoutAsync();
+        Auth.SetUser(null);
+        Nav.NavigateTo("login", replace: true);
+    }
+}

@@ -1,0 +1,161 @@
+{
+  "info": {
+    "name": "neuralnetgoal parser API",
+    "description": "Set the collection variables baseUrl and apiKey (Variables tab). 'Start results' / 'Start fixtures' store the new job id in {{jobId}} automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "X-Api-Key", "type": "string" },
+      { "key": "value", "value": "{{apiKey}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://187.77.98.186:5234" },
+    { "key": "apiKey", "value": "" },
+    { "key": "jobId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Health (no key needed)",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+        "description": "Expect status Healthy and site.reachable true. 'Degraded' means the server cannot reach betexplorer."
+      }
+    },
+    {
+      "name": "2. Security check: no key -> 401",
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/v1/countries", "host": ["{{baseUrl}}"], "path": ["v1", "countries"] }
+      }
+    },
+    {
+      "name": "3. Countries (186 expected)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/v1/countries", "host": ["{{baseUrl}}"], "path": ["v1", "countries"] }
+      }
+    },
+    {
+      "name": "4. League seasons of a country",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/v1/leagues?countryName=England&countryUrlPath=/football/england/",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "leagues"],
+          "query": [
+            { "key": "countryName", "value": "England" },
+            { "key": "countryUrlPath", "value": "/football/england/" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Start RESULTS job (5 newest matches)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('202 Accepted', () => pm.response.to.have.status(202));",
+              "const j = pm.response.json();",
+              "pm.collectionVariables.set('jobId', j.jobId);",
+              "console.log('jobId = ' + j.jobId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"league\": {\n    \"country\": \"England\",\n    \"division\": \"Premier League\",\n    \"season\": \"2026/2027\",\n    \"urlPath\": \"/football/england/premier-league/\"\n  },\n  \"options\": {\n    \"maxMatches\": 5,\n    \"includeAllStages\": true\n  }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/v1/results/scrape", "host": ["{{baseUrl}}"], "path": ["v1", "results", "scrape"] }
+      }
+    },
+    {
+      "name": "6. Start FIXTURES job",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('202 Accepted', () => pm.response.to.have.status(202));",
+              "pm.collectionVariables.set('jobId', pm.response.json().jobId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"league\": {\n    \"country\": \"England\",\n    \"division\": \"Premier League\",\n    \"season\": \"2026/2027\",\n    \"urlPath\": \"/football/england/premier-league/\"\n  },\n  \"options\": { \"requireOdds\": true }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/v1/fixtures/scrape", "host": ["{{baseUrl}}"], "path": ["v1", "fixtures", "scrape"] }
+      }
+    },
+    {
+      "name": "7. Job status + result",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/v1/jobs/{{jobId}}", "host": ["{{baseUrl}}"], "path": ["v1", "jobs", "{{jobId}}"] },
+        "description": "While running: status Running. When finished: status Completed and 'result' holds items, issues and stats."
+      }
+    },
+    {
+      "name": "8. Job events (SSE: one line per match)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Accept", "value": "text/event-stream" }],
+        "url": {
+          "raw": "{{baseUrl}}/v1/jobs/{{jobId}}/events?after=0",
+          "host": ["{{baseUrl}}"],
+          "path": ["v1", "jobs", "{{jobId}}", "events"],
+          "query": [
+            { "key": "after", "value": "0" },
+            { "key": "level", "value": "Info", "disabled": true },
+            { "key": "kinds", "value": "MatchParsed,MatchFailed", "disabled": true }
+          ]
+        },
+        "description": "Server-Sent Events. For a finished job you get every event and the stream closes. Postman may only show a live stream when it ends; for live viewing use: curl.exe -N -H \"X-Api-Key: <key>\" <baseUrl>/v1/jobs/<id>/events"
+      }
+    },
+    {
+      "name": "9. List jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/v1/jobs", "host": ["{{baseUrl}}"], "path": ["v1", "jobs"] }
+      }
+    },
+    {
+      "name": "10. Cancel job",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/v1/jobs/{{jobId}}", "host": ["{{baseUrl}}"], "path": ["v1", "jobs", "{{jobId}}"] },
+        "description": "202 = cancelled, 409 = already finished, 404 = unknown job."
+      }
+    }
+  ]
+}

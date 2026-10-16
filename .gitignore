@@ -55,3 +55,19 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+## neuralnetgoal parser + console
+appsettings.local.json
+parser/**/logs/
+neuralnetgoal.console/output/
+**/dumps/
+parser/samples/
+publish/
+output/
+
+# web app
+tools.neuralnetgoal.web/**/App_Data/
+tools.neuralnetgoal.web/**/appsettings.Production.json
+
+# Visual Studio local state
+.vs/

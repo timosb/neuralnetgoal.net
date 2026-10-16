@@ -1,0 +1,70 @@
+@page "/users"
+@attribute [Authorize(Roles = "Admin")]
+@inject ApiClient Api
+
+<PageTitle>Users - NeuralNetGoal</PageTitle>
+
+<h3 class="nng-accent mb-3">Users</h3>
+
+@if (_error is not null) { <div class="alert alert-danger">@_error</div> }
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <TelerikGrid Data="_users" Pageable="false" Height="420px">
+            <GridColumns>
+                <GridColumn Field="@nameof(UserDto.UserName)" Title="User" />
+                <GridColumn Field="@nameof(UserDto.Email)" Title="E-mail" />
+                <GridColumn Field="@nameof(UserDto.IsActive)" Title="Active" Width="90px" />
+                <GridColumn Field="@nameof(UserDto.HasPassword)" Title="Has password" Width="120px" />
+                <GridColumn Field="@nameof(UserDto.LastLoginUtc)" Title="Last login (UTC)" DisplayFormat="{0:dd/MM/yy HH:mm}" Width="150px" />
+                <GridColumn Title="Roles"><Template>@string.Join(", ", ((UserDto)context).Roles)</Template></GridColumn>
+                <GridColumn Title="" Width="130px">
+                    <Template>
+                        @{ var u = (UserDto)context; }
+                        <TelerikButton OnClick="@(() => ToggleAsync(u))" FillMode="@ThemeConstants.Button.FillMode.Outline">@(u.IsActive ? "Deactivate" : "Activate")</TelerikButton>
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+    <div class="col-lg-4">
+        <div class="nng-card">
+            <h5>New user</h5>
+            <p class="text-secondary small">The user must choose their own password at the first sign-in.</p>
+            <div class="mb-2"><label class="form-label">User name</label><TelerikTextBox @bind-Value="_name" Width="100%" /></div>
+            <div class="mb-2"><label class="form-label">E-mail</label><TelerikTextBox @bind-Value="_email" Width="100%" /></div>
+            <div class="mb-2"><label class="form-label">Display name</label><TelerikTextBox @bind-Value="_display" Width="100%" /></div>
+            <div class="mb-2"><label class="form-label">Role</label><TelerikDropDownList Data="Roles.All" @bind-Value="_role" Width="100%" /></div>
+            <div class="mb-3"><label class="form-label">Temporary password</label><TelerikTextBox @bind-Value="_password" Password="true" AutoComplete="new-password" Width="100%" /></div>
+            <TelerikButton OnClick="CreateAsync" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary">Create</TelerikButton>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<UserDto> _users = [];
+    private string? _error;
+    private string _name = "", _email = "", _display = "", _password = "", _role = Roles.Operator;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var r = await Api.UsersAsync();
+        Apply(r);
+    }
+
+    private async Task CreateAsync()
+    {
+        var r = await Api.CreateUserAsync(new CreateUserRequest(_name, string.IsNullOrWhiteSpace(_email) ? null : _email,
+            string.IsNullOrWhiteSpace(_display) ? null : _display, _role, _password));
+        if (Apply(r)) { _name = _email = _display = _password = ""; }
+    }
+
+    private async Task ToggleAsync(UserDto u) => Apply(await Api.SetActiveAsync(u.UserId, !u.IsActive));
+
+    private bool Apply(ApiResult<List<UserDto>> r)
+    {
+        _error = r.Ok ? null : r.Error;
+        if (r.Ok) _users = r.Value!;
+        return r.Ok;
+    }
+}

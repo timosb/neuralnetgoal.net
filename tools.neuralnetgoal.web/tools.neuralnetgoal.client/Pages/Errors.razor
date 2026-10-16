@@ -1,0 +1,34 @@
+@page "/errors"
+@attribute [Authorize]
+@inject ApiClient Api
+
+<PageTitle>Errors - NeuralNetGoal</PageTitle>
+
+<h3 class="nng-accent mb-3">Scrape problems <small class="text-secondary">(latest 200 of dbo.Errors)</small></h3>
+
+@if (_error is not null) { <div class="alert alert-danger">@_error</div> }
+
+<TelerikGrid Data="_rows" Pageable="true" PageSize="25" Sortable="true" Height="calc(100vh - 220px)">
+    <GridToolBarTemplate>
+        <TelerikButton OnClick="LoadAsync" Icon="@SvgIcon.ArrowRotateCw">Refresh</TelerikButton>
+    </GridToolBarTemplate>
+    <GridColumns>
+        <GridColumn Field="@nameof(ErrorRowDto.RunTime)" Title="When" DisplayFormat="{0:dd/MM/yy HH:mm}" Width="140px" />
+        <GridColumn Field="@nameof(ErrorRowDto.Message)" Title="Message" />
+        <GridColumn Field="@nameof(ErrorRowDto.Url)" Title="URL" />
+    </GridColumns>
+</TelerikGrid>
+
+@code {
+    private List<ErrorRowDto> _rows = [];
+    private string? _error;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _error = null;
+        var r = await Api.ErrorsAsync(200);
+        if (r.Ok) _rows = r.Value!; else _error = r.Error;
+    }
+}

@@ -1,0 +1,160 @@
+@page "/run"
+@attribute [Authorize(Roles = "Admin,Operator")]
+@implements IDisposable
+@inject ApiClient Api
+@inject IJSRuntime JS
+
+<PageTitle>Run - NeuralNetGoal</PageTitle>
+
+<h3 class="nng-accent mb-3">Run</h3>
+
+<div class="nng-card mb-3">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">What to do</label>
+            <TelerikDropDownList Data="_commands" TextField="Text" ValueField="Value" @bind-Value="_command" Width="100%" Enabled="@(!Running)" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Country</label>
+            <TelerikDropDownList Data="_countries" @bind-Value="_country" Width="100%" Enabled="@(!Running)" DefaultText="All" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Division</label>
+            <TelerikDropDownList Data="DivisionsOfCountry" @bind-Value="_division" Width="100%" Enabled="@(!Running)" DefaultText="All" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Newest N matches <small class="text-secondary">(empty = all)</small></label>
+            <TelerikNumericTextBox @bind-Value="_recent" Min="1" Max="1000" Width="100%" Enabled="@(!Running)" />
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            @if (Running)
+            {
+                <TelerikButton OnClick="CancelAsync" ThemeColor="@ThemeConstants.Button.ThemeColor.Warning">Cancel</TelerikButton>
+            }
+            else
+            {
+                <TelerikButton OnClick="StartAsync" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary">Start</TelerikButton>
+            }
+        </div>
+    </div>
+    <p class="text-secondary small mt-3 mb-0">
+        Scraping a league takes about a minute. The job keeps running on the server if you close this page; you can come back and see it on the dashboard.
+    </p>
+</div>
+
+@if (_error is not null) { <div class="alert alert-danger">@_error</div> }
+
+@if (_job is not null)
+{
+    <div class="d-flex align-items-center gap-3 mb-2">
+        <strong>@_job.Description</strong>
+        <span class="badge @StateClass">@_job.State</span>
+        @if (_job.FileName is not null)
+        {
+            <TelerikButton OnClick="DownloadAsync" ThemeColor="@ThemeConstants.Button.ThemeColor.Success" Icon="@SvgIcon.Download">Download @_job.FileName</TelerikButton>
+        }
+    </div>
+    <div class="nng-log" id="nng-log">
+        @foreach (var l in _lines)
+        {
+            <div class="@l.Level"><span class="time">@l.AtUtc.ToLocalTime().ToString("HH:mm:ss")</span>@l.Text</div>
+        }
+    </div>
+}
+
+@code {
+    private sealed record Choice(string Value, string Text);
+
+    private readonly List<Choice> _commands =
+    [
+        new(JobCommands.Results, "Results (scrape + save)"),
+        new(JobCommands.Tables, "League tables"),
+        new(JobCommands.Fixtures, "Fixtures + Excel"),
+        new(JobCommands.All, "All of the above"),
+        new(JobCommands.Training, "Training workbook"),
+    ];
+
+    [SupplyParameterFromQuery(Name = "cmd")] public string? Cmd { get; set; }
+
+    private string _command = JobCommands.Results;
+    private string? _country, _division;
+    private int? _recent;
+    private List<LeagueDto> _leagues = [];
+    private List<string> _countries = [];
+    private List<LeagueDto> _all = [];
+
+    private JobStatusDto? _job;
+    private readonly List<JobLogLine> _lines = [];
+    private string? _error;
+    private CancellationTokenSource? _poll;
+
+    private bool Running => _job is { State: JobStates.Running };
+    private string StateClass => _job?.State switch
+    {
+        JobStates.Running => "bg-info text-dark", JobStates.Completed => "bg-success", JobStates.Cancelled => "bg-warning text-dark", _ => "bg-danger",
+    };
+    private List<string> DivisionsOfCountry => _all.Where(l => _country is null || l.Country == _country).Select(l => l.Division).Distinct().OrderBy(x => x).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var l = await Api.LeaguesAsync();
+        if (l.Ok) { _all = l.Value!; _countries = _all.Select(x => x.Country).Distinct().OrderBy(x => x).ToList(); }
+
+        // pick up a job that is still running (for example after a page reload)
+        var jobs = await Api.JobsAsync();
+        if (jobs.Ok && jobs.Value!.FirstOrDefault(j => j.State == JobStates.Running) is { } running)
+            await AttachAsync(running.Id);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (_commands.Any(c => c.Value == Cmd) && !Running) _command = Cmd!;
+    }
+
+    private async Task StartAsync()
+    {
+        _error = null; _lines.Clear();
+        var r = await Api.StartJobAsync(new StartJobRequest(_command, _country, _division, _recent));
+        if (!r.Ok) { _error = r.Error; return; }
+        await AttachAsync(r.Value!.Id);
+    }
+
+    private async Task AttachAsync(string id)
+    {
+        _poll?.Cancel();
+        _poll = new CancellationTokenSource();
+        _lines.Clear();
+        _ = PollAsync(id, _poll.Token);
+        await Task.CompletedTask;
+    }
+
+    // Once a second: ask only for the lines after the last one we have.
+    private async Task PollAsync(string id, CancellationToken ct)
+    {
+        long after = 0;
+        var failures = 0;
+        while (!ct.IsCancellationRequested)
+        {
+            var r = await Api.JobAsync(id, after);
+            if (r.Ok)
+            {
+                failures = 0;
+                _job = r.Value;
+                _lines.AddRange(r.Value!.Lines);
+                after = r.Value.NextSeq;
+                await InvokeAsync(StateHasChanged);
+                await JS.InvokeVoidAsync("nngScrollToEnd", "nng-log");
+                if (r.Value.State != JobStates.Running) return;
+            }
+            else if (++failures >= 5) { _error = "Lost contact with the server: " + r.Error; await InvokeAsync(StateHasChanged); return; }
+
+            try { await Task.Delay(1000, ct); } catch (OperationCanceledException) { return; }
+        }
+    }
+
+    private async Task CancelAsync() { if (_job is not null) await Api.CancelJobAsync(_job.Id); }
+
+    private async Task DownloadAsync() => await JS.InvokeVoidAsync("nngDownload", $"api/jobs/{_job!.Id}/file", _job.FileName);
+
+    public void Dispose() { _poll?.Cancel(); _poll?.Dispose(); }
+}
